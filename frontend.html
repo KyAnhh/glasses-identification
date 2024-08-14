@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <style>
+        /* Thêm style để làm đẹp bảng nhập liệu */
+        table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        th,
+        td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Glass Identification</h2>
+    <form id="dataForm">
+        <table>
+            <tr>
+                <th>Feature</th>
+                <th>Value</th>
+            </tr>
+            <tr>
+                <td>RI</td>
+                <td><input type="number" name="RI" required></td>
+            </tr>
+            <tr>
+                <td>Na</td>
+                <td><input type="number" name="Na" required></td>
+            </tr>
+            <tr>
+                <td>Mg</td>
+                <td><input type="number" name="Mg" required></td>
+            </tr>
+            <tr>
+                <td>Al</td>
+                <td><input type="number" name="Al" required></td>
+            </tr>
+            <tr>
+                <td>Si</td>
+                <td><input type="number" name="Si" required></td>
+            </tr>
+            <tr>
+                <td>K</td>
+                <td><input type="number" name="K" required></td>
+            </tr>
+            <tr>
+                <td>Ca</td>
+                <td><input type="number" name="Ca" required></td>
+            </tr>
+            <tr>
+                <td>Ba</td>
+                <td><input type="number" name="Ba" required></td>
+            </tr>
+            <tr>
+                <td>Fe</td>
+                <td><input type="number" name="Fe" required></td>
+            </tr>
+
+        </table>
+        <button type="button" onclick="submitData()">Predict</button>
+    </form>
+    <div id="result"></div>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        const form = document.getElementById('dataForm');
+
+        const inputs = form.querySelectorAll('input[type="number"]');
+
+        // Lưu trữ dữ liệu người dùng nhập vào localStorage
+        function storeUserInput() {
+            inputs.forEach(input => {
+                localStorage.setItem(input.name, input.value);
+            });
+        }
+
+        // Khôi phục dữ liệu người dùng đã nhập (nếu có)
+        function restoreUserInput() {
+            inputs.forEach(input => {
+                const storedValue = localStorage.getItem(input.name);
+                if (storedValue) {
+                    input.value = storedValue;
+                }
+            });
+        }
+
+        // Gọi restoreUserInput khi trang load
+        restoreUserInput();
+
+        function submitData() {
+            const formData = new FormData(document.getElementById('dataForm'));
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            const URL = 'http://KyAnh.pythonanywhere.com/glasses-identification';
+            // Gửi dữ liệu đến API
+            axios.post(URL, data)
+                .then(response => {
+                    const prediction = response.data.prediction;
+                    document.getElementById('result').textContent = `Dự đoán: ${prediction}`;
+                })
+                .catch(error => {
+                    console.error('Lỗi khi fetch dữ liệu', error);
+                    document.getElementById('result').textContent = 'Không thể lấy dữ liệu. Vui lòng thử lại sau.';
+                });
+        }
+    </script>
+</body>
+
+</html>
